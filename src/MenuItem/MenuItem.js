@@ -117,11 +117,11 @@ class MenuItem extends Component {
      */
     menuItems: PropTypes.node,
     /**
-     * Callback function fired when the menu item is touch-tapped.
+     * Callback function fired when the menu item is clicked.
      *
-     * @param {object} event TouchTap event targeting the menu item.
+     * @param {object} event Click event targeting the menu item.
      */
-    onTouchTap: PropTypes.func,
+    onClick: PropTypes.func,
     /**
      * Can be used to render primary text within the menu item.
      */
@@ -206,19 +206,19 @@ class MenuItem extends Component {
 
   cloneMenuItem = (item) => {
     return React.cloneElement(item, {
-      onTouchTap: (event) => {
+      onClick: (event) => {
         if (!item.props.menuItems) {
           this.handleRequestClose();
         }
 
-        if (item.props.onTouchTap) {
-          item.props.onTouchTap(event);
+        if (item.props.onClick) {
+          item.props.onClick(event);
         }
       },
     });
   };
 
-  handleTouchTap = (event) => {
+  handleClick = (event) => {
     event.preventDefault();
 
     this.setState({
@@ -226,8 +226,8 @@ class MenuItem extends Component {
       anchorEl: ReactDOM.findDOMNode(this),
     });
 
-    if (this.props.onTouchTap) {
-      this.props.onTouchTap(event);
+    if (this.props.onClick) {
+      this.props.onClick(event);
     }
   };
 
@@ -308,7 +308,7 @@ class MenuItem extends Component {
           </Menu>
         </Popover>
       );
-      other.onTouchTap = this.handleTouchTap;
+      other.onClick = this.handleClick;
     }
 
     return (

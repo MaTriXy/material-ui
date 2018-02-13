@@ -34,10 +34,11 @@ class Calendar extends Component {
     minDate: PropTypes.object,
     mode: PropTypes.oneOf(['portrait', 'landscape']),
     okLabel: PropTypes.node,
-    onTouchTapCancel: PropTypes.func,
-    onTouchTapDay: PropTypes.func,
-    onTouchTapOk: PropTypes.func,
+    onClickCancel: PropTypes.func,
+    onClickDay: PropTypes.func,
+    onClickOk: PropTypes.func,
     open: PropTypes.bool,
+    openToYearSelection: PropTypes.bool,
     shouldDisableDate: PropTypes.func,
     utils: PropTypes.object,
   };
@@ -56,7 +57,7 @@ class Calendar extends Component {
 
   state = {
     displayDate: undefined,
-    displayMonthDay: true,
+    displayMonthDay: undefined,
     selectedDate: undefined,
     transitionDirection: 'left',
     transitionEnter: true,
@@ -66,6 +67,7 @@ class Calendar extends Component {
     this.setState({
       displayDate: this.props.utils.getFirstDayOfMonth(this.props.initialDate),
       selectedDate: this.props.initialDate,
+      displayMonthDay: !this.props.openToYearSelection,
     });
   }
 
@@ -78,6 +80,8 @@ class Calendar extends Component {
       });
     }
   }
+
+  calendarRefs = {};
 
   getMinDate() {
     return this.props.minDate || this.props.utils.addYears(new Date(), -100);
@@ -96,7 +100,11 @@ class Calendar extends Component {
       return false;
     }
 
-    return this.refs.calendar.isSelectedDateDisabled();
+    if (this.calendarRefs.calendar) {
+      return this.calendarRefs.calendar.isSelectedDateDisabled();
+    } else {
+      return false;
+    }
   }
 
   addSelectedDays(days) {
@@ -113,9 +121,11 @@ class Calendar extends Component {
 
   setDisplayDate(date, newSelectedDate) {
     const newDisplayDate = this.props.utils.getFirstDayOfMonth(date);
-    const direction = newDisplayDate > this.state.displayDate ? 'left' : 'right';
 
     if (newDisplayDate !== this.state.displayDate) {
+      const nextDirection = this.context.muiTheme.isRtl ? 'right' : 'left';
+      const prevDirection = this.context.muiTheme.isRtl ? 'left' : 'right';
+      const direction = newDisplayDate > this.state.displayDate ? nextDirection : prevDirection;
       this.setState({
         displayDate: newDisplayDate,
         transitionDirection: direction,
@@ -144,21 +154,24 @@ class Calendar extends Component {
     }
   }
 
-  handleTouchTapDay = (event, date) => {
+  handleClickDay = (event, date) => {
     this.setSelectedDate(date);
-    if (this.props.onTouchTapDay) this.props.onTouchTapDay(event, date);
+    if (this.props.onClickDay) this.props.onClickDay(event, date);
   };
 
   handleMonthChange = (months) => {
+    const nextDirection = this.context.muiTheme.isRtl ? 'right' : 'left';
+    const prevDirection = this.context.muiTheme.isRtl ? 'left' : 'right';
+    const direction = months >= 0 ? nextDirection : prevDirection;
     this.setState({
-      transitionDirection: months >= 0 ? 'left' : 'right',
+      transitionDirection: direction,
       displayDate: this.props.utils.addMonths(this.state.displayDate, months),
     });
   };
 
-  handleTouchTapYear = (event, year) => {
+  handleClickYear = (event, year) => {
     this.setSelectedDate(this.props.utils.setYear(this.state.selectedDate, year), event);
-    this.handleTouchTapDateDisplayMonthDay();
+    this.handleClickDateDisplayMonthDay();
   };
 
   getToolbarInteractions() {
@@ -168,13 +181,13 @@ class Calendar extends Component {
     };
   }
 
-  handleTouchTapDateDisplayMonthDay = () => {
+  handleClickDateDisplayMonthDay = () => {
     this.setState({
       displayMonthDay: true,
     });
   };
 
-  handleTouchTapDateDisplayYear = () => {
+  handleClickDateDisplayYear = () => {
     this.setState({
       displayMonthDay: false,
     });
@@ -182,6 +195,8 @@ class Calendar extends Component {
 
   handleWindowKeyDown = (event) => {
     if (this.props.open) {
+      const nextArrow = this.context.muiTheme.isRtl ? 'left' : 'right';
+      const prevArrow = this.context.muiTheme.isRtl ? 'right' : 'left';
       switch (keycode(event)) {
         case 'up':
           if (event.altKey && event.shiftKey) {
@@ -203,7 +218,7 @@ class Calendar extends Component {
           }
           break;
 
-        case 'right':
+        case nextArrow:
           if (event.altKey && event.shiftKey) {
             this.addSelectedYears(1);
           } else if (event.shiftKey) {
@@ -213,7 +228,7 @@ class Calendar extends Component {
           }
           break;
 
-        case 'left':
+        case prevArrow:
           if (event.altKey && event.shiftKey) {
             this.addSelectedYears(-1);
           } else if (event.shiftKey) {
@@ -233,7 +248,7 @@ class Calendar extends Component {
           key="years"
           DateTimeFormat={this.props.DateTimeFormat}
           locale={this.props.locale}
-          onTouchTapYear={this.handleTouchTapYear}
+          onClickYear={this.handleClickYear}
           selectedDate={this.state.selectedDate}
           minDate={this.getMinDate()}
           maxDate={this.getMaxDate()}
@@ -305,8 +320,8 @@ class Calendar extends Component {
       firstDayOfWeek,
       locale,
       okLabel,
-      onTouchTapCancel, // eslint-disable-line no-unused-vars
-      onTouchTapOk, // eslint-disable-line no-unused-vars
+      onClickCancel, // eslint-disable-line no-unused-vars
+      onClickOk, // eslint-disable-line no-unused-vars
       utils,
     } = this.props;
 
@@ -320,8 +335,8 @@ class Calendar extends Component {
           <DateDisplay
             DateTimeFormat={DateTimeFormat}
             disableYearSelection={this.props.disableYearSelection}
-            onTouchTapMonthDay={this.handleTouchTapDateDisplayMonthDay}
-            onTouchTapYear={this.handleTouchTapDateDisplayYear}
+            onClickMonthDay={this.handleClickDateDisplayMonthDay}
+            onClickYear={this.handleClickDateDisplayYear}
             locale={locale}
             monthDaySelected={this.state.displayMonthDay}
             mode={this.props.mode}
@@ -355,8 +370,8 @@ class Calendar extends Component {
                   key={this.state.displayDate.toDateString()}
                   minDate={this.getMinDate()}
                   maxDate={this.getMaxDate()}
-                  onTouchTapDay={this.handleTouchTapDay}
-                  ref="calendar"
+                  onClickDay={this.handleClickDay}
+                  ref={(ref) => this.calendarRefs.calendar = ref}
                   selectedDate={this.state.selectedDate}
                   shouldDisableDate={this.props.shouldDisableDate}
                   utils={utils}
@@ -374,8 +389,8 @@ class Calendar extends Component {
               autoOk={this.props.autoOk}
               cancelLabel={cancelLabel}
               okLabel={okLabel}
-              onTouchTapCancel={onTouchTapCancel}
-              onTouchTapOk={onTouchTapOk}
+              onClickCancel={onClickCancel}
+              onClickOk={onClickOk}
             />
           }
         </div>

@@ -29,6 +29,7 @@ class DatePickerDialog extends Component {
     onDismiss: PropTypes.func,
     onShow: PropTypes.func,
     open: PropTypes.bool,
+    openToYearSelection: PropTypes.bool,
     shouldDisableDate: PropTypes.func,
     style: PropTypes.object,
     utils: PropTypes.object,
@@ -40,6 +41,7 @@ class DatePickerDialog extends Component {
     container: 'dialog',
     locale: 'en-US',
     okLabel: 'OK',
+    openToYearSelection: false,
   };
 
   static contextTypes = {
@@ -70,13 +72,13 @@ class DatePickerDialog extends Component {
     });
   };
 
-  handleTouchTapDay = () => {
+  handleClickDay = () => {
     if (this.props.autoOk) {
-      setTimeout(this.handleTouchTapOk, 300);
+      setTimeout(this.handleClickOk, 300);
     }
   };
 
-  handleTouchTapCancel = () => {
+  handleClickCancel = () => {
     this.dismiss();
   };
 
@@ -84,18 +86,20 @@ class DatePickerDialog extends Component {
     this.dismiss();
   };
 
-  handleTouchTapOk = () => {
+  handleClickOk = () => {
     if (this.props.onAccept && !this.refs.calendar.isSelectedDateDisabled()) {
       this.props.onAccept(this.refs.calendar.getSelectedDate());
     }
 
-    this.dismiss();
+    this.setState({
+      open: false,
+    });
   };
 
   handleWindowKeyUp = (event) => {
     switch (keycode(event)) {
       case 'enter':
-        this.handleTouchTapOk();
+        this.handleClickOk();
         break;
     }
   };
@@ -118,6 +122,7 @@ class DatePickerDialog extends Component {
       onAccept, // eslint-disable-line no-unused-vars
       onDismiss, // eslint-disable-line no-unused-vars
       onShow, // eslint-disable-line no-unused-vars
+      openToYearSelection,
       shouldDisableDate,
       hideCalendarDate,
       style, // eslint-disable-line no-unused-vars
@@ -166,15 +171,16 @@ class DatePickerDialog extends Component {
             firstDayOfWeek={firstDayOfWeek}
             initialDate={initialDate}
             locale={locale}
-            onTouchTapDay={this.handleTouchTapDay}
+            onClickDay={this.handleClickDay}
             maxDate={maxDate}
             minDate={minDate}
             mode={mode}
             open={open}
             ref="calendar"
-            onTouchTapCancel={this.handleTouchTapCancel}
-            onTouchTapOk={this.handleTouchTapOk}
+            onClickCancel={this.handleClickCancel}
+            onClickOk={this.handleClickOk}
             okLabel={okLabel}
+            openToYearSelection={openToYearSelection}
             shouldDisableDate={shouldDisableDate}
             hideCalendarDate={hideCalendarDate}
             utils={utils}

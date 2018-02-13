@@ -166,6 +166,8 @@ class DialogInline extends Component {
     open: PropTypes.bool.isRequired,
     overlayClassName: PropTypes.string,
     overlayStyle: PropTypes.object,
+    paperClassName: PropTypes.string,
+    paperProps: PropTypes.object,
     repositionOnUpdate: PropTypes.bool,
     style: PropTypes.object,
     title: PropTypes.node,
@@ -250,7 +252,7 @@ class DialogInline extends Component {
     }
   }
 
-  handleTouchTapOverlay = () => {
+  handleClickOverlay = () => {
     this.requestClose(false);
   };
 
@@ -278,10 +280,12 @@ class DialogInline extends Component {
       overlayClassName,
       overlayStyle,
       open,
+      paperClassName,
+      paperProps,
+      style,
       titleClassName,
       titleStyle,
       title,
-      style,
     } = this.props;
 
     const {prepareStyles} = this.context.muiTheme;
@@ -336,7 +340,7 @@ class DialogInline extends Component {
               className={contentClassName}
               style={styles.content}
             >
-              <Paper zDepth={4}>
+              <Paper className={paperClassName} zDepth={4} {...paperProps}>
                 {titleElement}
                 <div
                   ref="dialogContent"
@@ -354,7 +358,7 @@ class DialogInline extends Component {
           show={open}
           className={overlayClassName}
           style={styles.overlay}
-          onTouchTap={this.handleTouchTapOverlay}
+          onClick={this.handleClickOverlay}
         />
       </div>
     );
@@ -398,7 +402,7 @@ class Dialog extends Component {
      */
     children: PropTypes.node,
     /**
-     * The css class name of the root element.
+     * @ignore
      */
     className: PropTypes.string,
     /**
@@ -432,6 +436,14 @@ class Dialog extends Component {
      * Overrides the inline-styles of the `Overlay` component that is rendered behind the `Dialog`.
      */
     overlayStyle: PropTypes.object,
+    /**
+     * The CSS class name of the `Paper` element.
+     */
+    paperClassName: PropTypes.string,
+    /**
+     * Properties applied to the `Paper` element.
+     */
+    paperProps: PropTypes.object,
     /**
      * Determines whether the `Dialog` should be repositioned when it's contents are updated.
      */

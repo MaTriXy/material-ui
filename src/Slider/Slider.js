@@ -383,38 +383,51 @@ class Slider extends Component {
 
   componentWillMount() {
     const {
-      value: valueProp,
       defaultValue,
       min,
       max,
     } = this.props;
 
-    let value = valueProp;
+    let {
+      value,
+    } = this.props;
+
     if (value === undefined) {
       value = defaultValue !== undefined ? defaultValue : min;
     }
 
-    if (value > max) {
-      value = max;
-    } else if (value < min) {
-      value = min;
-    }
-
     this.setState({
-      value: value,
+      value: this.resolveValue(value, min, max),
     });
   }
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.value !== undefined && !this.state.dragging) {
+      const {
+        min = this.props.min,
+        max = this.props.max,
+      } = nextProps;
+
       this.setState({
-        value: nextProps.value,
+        value: this.resolveValue(nextProps.value, min, max),
       });
     }
   }
 
   track = null;
   handle = null;
+
+  resolveValue = (value, min, max) => {
+    if (value > max) {
+      return max;
+    }
+
+    if (value < min) {
+      return min;
+    }
+
+    return value;
+  }
 
   handleKeyDown = (event) => {
     const {
@@ -491,13 +504,7 @@ class Slider extends Component {
 
       // We need to use toFixed() because of float point errors.
       // For example, 0.01 + 0.06 = 0.06999999999999999
-      newValue = parseFloat(newValue.toFixed(5));
-
-      if (newValue > max) {
-        newValue = max;
-      } else if (newValue < min) {
-        newValue = min;
-      }
+      newValue = this.resolveValue(parseFloat(newValue.toFixed(5)), min, max);
 
       if (this.state.value !== newValue) {
         this.setState({
@@ -664,7 +671,8 @@ class Slider extends Component {
     const {isRtl} = this.context.muiTheme;
 
     const calculatedAxis = calculateAxis(axis, isRtl);
-
+    
+    if (!this.track) return 0;
     return this.track.getBoundingClientRect()[mainAxisOffsetProperty[calculatedAxis]];
   }
 
@@ -745,6 +753,8 @@ class Slider extends Component {
       value = parseFloat(value.toFixed(5));
     }
 
+    value = this.resolveValue(value, min, max);
+
     if (this.state.value !== value) {
       this.setState({
         value: value,
@@ -773,6 +783,7 @@ class Slider extends Component {
       sliderStyle,
       step,
       style,
+      value: propValue, // eslint-disable-line no-unused-vars
       ...other
     } = this.props;
 
@@ -824,7 +835,7 @@ class Slider extends Component {
           onMouseLeave={this.handleMouseLeave}
           onMouseUp={this.handleMouseUp}
           onTouchStart={this.handleTouchStart}
-          onKeyDown={!disabled && this.handleKeyDown}
+          onKeyDown={!disabled ? this.handleKeyDown : undefined}
         >
           <div ref={(node) => this.track = node} style={prepareStyles(styles.track)}>
             <div style={prepareStyles(styles.filled)} />

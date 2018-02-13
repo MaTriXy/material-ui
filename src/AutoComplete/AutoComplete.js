@@ -135,7 +135,7 @@ class AutoComplete extends Component {
      * Callback function that is fired when a list item is selected, or enter is pressed in the `TextField`.
      *
      * @param {string} chosenRequest Either the `TextField` input value, if enter is pressed in the `TextField`,
-     * or the text value of the corresponding list item that was selected.
+     * or the dataSource object corresponding to the list item that was selected.
      * @param {number} index The index in `dataSource` of the list item selected, or `-1` if enter is pressed in the
      * `TextField`.
      */
@@ -219,7 +219,7 @@ class AutoComplete extends Component {
       open: this.props.open,
       searchText: this.props.searchText || '',
     });
-    this.timerTouchTapCloseId = null;
+    this.timerClickCloseId = null;
   }
 
   componentWillReceiveProps(nextProps) {
@@ -237,7 +237,7 @@ class AutoComplete extends Component {
   }
 
   componentWillUnmount() {
-    clearTimeout(this.timerTouchTapCloseId);
+    clearTimeout(this.timerClickCloseId);
     clearTimeout(this.timerBlurClose);
   }
 
@@ -265,30 +265,30 @@ class AutoComplete extends Component {
     event.preventDefault();
   };
 
-  handleItemTouchTap = (event, child) => {
+  handleItemClick = (event, child) => {
     const dataSource = this.props.dataSource;
     const index = parseInt(child.key, 10);
     const chosenRequest = dataSource[index];
     const searchText = this.chosenRequestText(chosenRequest);
 
     const updateInput = () => this.props.onUpdateInput(searchText, this.props.dataSource, {
-      source: 'touchTap',
+      source: 'click',
     });
-    this.timerTouchTapCloseId = () => setTimeout(() => {
-      this.timerTouchTapCloseId = null;
+    this.timerClickCloseId = () => setTimeout(() => {
+      this.timerClickCloseId = null;
       this.close();
       this.props.onNewRequest(chosenRequest, index);
     }, this.props.menuCloseDelay);
 
     if (typeof this.props.searchText !== 'undefined') {
       updateInput();
-      this.timerTouchTapCloseId();
+      this.timerClickCloseId();
     } else {
       this.setState({
         searchText: searchText,
       }, () => {
         updateInput();
-        this.timerTouchTapCloseId();
+        this.timerClickCloseId();
       });
     }
   };
@@ -344,19 +344,24 @@ class AutoComplete extends Component {
       return;
     }
 
-    this.setState({
-      searchText: searchText,
+    const state = {
       open: true,
       anchorEl: ReactDOM.findDOMNode(this.refs.searchTextField),
-    }, () => {
-      this.props.onUpdateInput(searchText, this.props.dataSource, {
-        source: 'change',
-      });
+    };
+
+    if (this.props.searchText === undefined) {
+      state.searchText = searchText;
+    }
+
+    this.setState(state);
+
+    this.props.onUpdateInput(searchText, this.props.dataSource, {
+      source: 'change',
     });
   };
 
   handleBlur = (event) => {
-    if (this.state.focusTextField && this.timerTouchTapCloseId === null) {
+    if (this.state.focusTextField && this.timerClickCloseId === null) {
       this.timerBlurClose = setTimeout(() => {
         this.close();
       }, 0);
@@ -466,7 +471,7 @@ class AutoComplete extends Component {
             if (!this.props.filter(searchText, itemText, item)) break;
 
             const itemValue = item[this.props.dataSourceConfig.value];
-            if (itemValue.type && (itemValue.type.muiName === MenuItem.muiName ||
+            if (itemValue && itemValue.type && (itemValue.type.muiName === MenuItem.muiName ||
                itemValue.type.muiName === Divider.muiName)) {
               requestsList.push({
                 text: itemText,
@@ -506,7 +511,7 @@ class AutoComplete extends Component {
         disableAutoFocus={focusTextField}
         onEscKeyDown={this.handleEscKeyDown}
         initiallyKeyboardFocused={true}
-        onItemTouchTap={this.handleItemTouchTap}
+        onItemClick={this.handleItemClick}
         onMouseDown={this.handleMouseDown}
         style={Object.assign(styles.menu, menuStyle)}
         listStyle={Object.assign(styles.list, listStyle)}

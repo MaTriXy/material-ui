@@ -63,10 +63,37 @@ const appList = [
     source: 'https://github.com/Joonpark13/serif.nu',
   },
   {
+    title: 'Order form for Wedding Videos',
+    author: 'Sergey Reznikov',
+    img: 'images/showcase/wv-order-form.png',
+    link: 'http://order-form.reznikov.online/',
+    source: 'https://bitbucket.org/wzup/order-form',
+  },
+  {
+    title: 'React Most Wanted',
+    author: 'Tarik Huber',
+    img: 'images/showcase/react-most-wanted.png',
+    link: 'https://www.react-most-wanted.com/',
+    source: 'https://github.com/TarikHuber/react-most-wanted',
+  },
+  {
+    title: 'Crypticker.io',
+    author: 'Sébastien Castiel',
+    img: 'images/showcase/crypticker.png',
+    link: 'https://crypticker.io/',
+    source: 'https://gitlab.com/scastiel/crypticker',
+  },
+  {
     title: 'Cloudcraft',
     author: 'Cloudcraft',
     img: 'images/showcase/cloudcraft.png',
     link: 'https://cloudcraft.co/',
+  },
+  {
+    title: 'Golden Hour Invoice Builder',
+    author: 'Mahesh Kumar J',
+    img: 'images/showcase/gh-invoice-builder.png',
+    link: 'https://invoicebuilder.goldenhour.co',
   },
   {
     title: 'It\'s quiz',
@@ -111,12 +138,6 @@ const appList = [
     link: 'https://www.realtyadvisorselite.com/',
   },
   {
-    title: 'Humorista Jokes',
-    author: 'Minas Mina',
-    img: 'images/showcase/humorista.png',
-    link: 'https://humorista.org/',
-  },
-  {
     title: 'ApiRequest Capture (Chrome Extension)',
     author: 'team@moesif.com',
     img: 'images/showcase/apirequest-capture-by-moesif.png',
@@ -127,6 +148,42 @@ const appList = [
     author: 'Larry Xu',
     img: 'images/showcase/slimchess.png',
     link: 'https://slimchess.com',
+  },
+  {
+    title: 'DevSketch',
+    author: 'Hai Le',
+    img: 'images/showcase/devsketch.png',
+    link: 'https://devsketch.io/',
+  },
+  {
+    title: 'BrainBOK - PMP / CAPM Exam Prep Simplified',
+    author: 'BrainBOK',
+    img: 'images/showcase/brainbok-for-pmp-capm-certification.png',
+    link: 'https://www.brainbok.com',
+  },
+  {
+    title: 'HoopHubs篮圈 - 查CBA/NBA比赛数据，就上HoopHubs篮圈',
+    author: 'HoopHubs',
+    img: 'images/showcase/hoophubs-basketball-stats-tool.png',
+    link: 'http://www.hoophubs.com',
+  },
+  {
+    title: 'AlarmDJ - Online Alarm Clock',
+    author: 'Arnon Eilat',
+    img: 'images/showcase/alarmdj.png',
+    link: 'https://alarmdj.com',
+  },
+  {
+    title: 'Weekend travel inspiration',
+    author: 'FlyWeekend',
+    img: 'images/showcase/flyweekend.png',
+    link: 'https://flyweekend.co',
+  },
+  {
+    title: 'smpl - Coworking Space Management',
+    author: 'smpl',
+    img: 'images/showcase/smpl.png',
+    link: 'https://smpl.io/features/your-experience/',
   },
 ];
 

@@ -68,7 +68,7 @@ class EnhancedTextarea extends Component {
   }
 
   componentDidMount() {
-    this.syncHeightWithShadow();
+    this.syncHeightWithShadow(this.props.value);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -79,7 +79,7 @@ class EnhancedTextarea extends Component {
   }
 
   handleResize = (event) => {
-    this.syncHeightWithShadow(undefined, event);
+    this.syncHeightWithShadow(this.props.value, event);
   };
 
   getInputNode() {
@@ -115,8 +115,12 @@ class EnhancedTextarea extends Component {
     newHeight = Math.max(newHeight, rowsHeight);
 
     if (this.state.height !== newHeight) {
+      const input = this.refs.input;
+      const cursorPosition = input.selectionStart;
       this.setState({
         height: newHeight,
+      }, () => {
+        input.setSelectionRange(cursorPosition, cursorPosition);
       });
 
       if (props.onHeightChange) {
@@ -126,7 +130,9 @@ class EnhancedTextarea extends Component {
   }
 
   handleChange = (event) => {
-    this.syncHeightWithShadow(event.target.value);
+    if (!this.props.hasOwnProperty('value')) {
+      this.syncHeightWithShadow(event.target.value);
+    }
 
     if (this.props.hasOwnProperty('valueLink')) {
       this.props.valueLink.requestChange(event.target.value);
@@ -147,7 +153,7 @@ class EnhancedTextarea extends Component {
       style,
       hintText, // eslint-disable-line no-unused-vars
       textareaStyle,
-      valueLink, // eslint-disable-line no-unused-vars
+      valueLink,
       ...other
     } = this.props;
 
@@ -156,9 +162,11 @@ class EnhancedTextarea extends Component {
     const rootStyles = Object.assign(styles.root, style);
     const textareaStyles = Object.assign(styles.textarea, textareaStyle);
     const shadowStyles = Object.assign({}, textareaStyles, styles.shadow, shadowStyle);
+    const props = {};
 
     if (this.props.hasOwnProperty('valueLink')) {
-      other.value = this.props.valueLink.value;
+      other.value = valueLink.value;
+      props.valueLink = valueLink;
     }
 
     return (
@@ -172,7 +180,7 @@ class EnhancedTextarea extends Component {
           defaultValue={this.props.defaultValue}
           readOnly={true}
           value={this.props.value}
-          valueLink={this.props.valueLink}
+          {...props}
         />
         <textarea
           {...other}
